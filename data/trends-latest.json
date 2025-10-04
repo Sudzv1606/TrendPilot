@@ -2,20 +2,26 @@
   "success": true,
   "trends": [
     {
-      "topic": "⚠️ Setup Required",
+      "topic": "🚀 TrendPilot News Website Active",
       "score": 100,
-      "summary": "GitHub Actions workflow needs to be triggered to fetch real trend data. Please run the 'Fetch Latest Trends' workflow manually.",
+      "summary": "Welcome to the new TrendPilot news website! Real-time AI-powered trend analysis with continuous updates every 30 minutes.",
       "sources": ["System"],
       "examples": [
-        "Go to Actions tab in your repository",
-        "Click 'Fetch Latest Trends' workflow",
-        "Click 'Run workflow' button",
-        "Wait for completion and refresh"
+        "30-minute update intervals",
+        "AI-powered trend analysis",
+        "Real-time data from multiple sources",
+        "Modern news website layout"
       ],
-      "timestamp": "2025-10-04T23:20:00.000Z"
+      "timestamp": "2025-10-04T23:25:00.000Z",
+      "category": "Technology",
+      "readTime": 2,
+      "url": "/trend/trendpilot-news-website-active",
+      "isNew": true,
+      "publishedAt": "2025-10-04T23:25:00.000Z",
+      "lastUpdated": "2025-10-04T23:25:00.000Z"
     }
   ],
   "totalItems": 1,
-  "timestamp": "2025-10-04T23:20:00.000Z",
-  "source": "setup"
+  "timestamp": "2025-10-04T23:25:00.000Z",
+  "source": "system"
 }

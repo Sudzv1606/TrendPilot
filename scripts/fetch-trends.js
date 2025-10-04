@@ -226,13 +226,24 @@ Return only valid JSON array, no other text.`;
             trends = generateFallbackTrends(items);
         }
 
-        // Enhance trends with source mapping
-        return trends.map(trend => ({
-            ...trend,
-            sources: [...new Set(trend.sources)], // Remove duplicates
-            score: Math.min(100, Math.max(0, trend.score)), // Ensure score is 0-100
-            timestamp: new Date().toISOString()
-        }));
+        // Enhance trends with source mapping and categorization
+        return trends.map(trend => {
+            const category = detectCategory(trend.topic);
+            const readTime = estimateReadTime(trend.summary);
+
+            return {
+                ...trend,
+                sources: [...new Set(trend.sources)], // Remove duplicates
+                score: Math.min(100, Math.max(0, trend.score)), // Ensure score is 0-100
+                timestamp: new Date().toISOString(),
+                category: category,
+                readTime: readTime,
+                url: generateTrendUrl(trend.topic),
+                isNew: true, // Mark as new for first 30 minutes
+                publishedAt: new Date().toISOString(),
+                lastUpdated: new Date().toISOString()
+            };
+        });
 
     } catch (error) {
         console.error('Error analyzing trends with AI:', error.message);
@@ -320,6 +331,49 @@ async function main() {
         console.error('Error in main execution:', error);
         process.exit(1);
     }
+}
+
+// Helper functions for enhanced trend data
+function detectCategory(topic) {
+    const topicLower = topic.toLowerCase();
+
+    if (topicLower.includes('ai') || topicLower.includes('machine learning') || topicLower.includes('neural') || topicLower.includes('gpt') || topicLower.includes('llm')) {
+        return 'AI & Machine Learning';
+    }
+    if (topicLower.includes('web3') || topicLower.includes('blockchain') || topicLower.includes('crypto') || topicLower.includes('nft') || topicLower.includes('defi')) {
+        return 'Web3 & Blockchain';
+    }
+    if (topicLower.includes('startup') || topicLower.includes('funding') || topicLower.includes('venture') || topicLower.includes('entrepreneur')) {
+        return 'Startups & Business';
+    }
+    if (topicLower.includes('github') || topicLower.includes('code') || topicLower.includes('developer') || topicLower.includes('programming') || topicLower.includes('framework')) {
+        return 'Developer Tools';
+    }
+    if (topicLower.includes('mobile') || topicLower.includes('app') || topicLower.includes('ios') || topicLower.includes('android')) {
+        return 'Mobile & Apps';
+    }
+    if (topicLower.includes('cloud') || topicLower.includes('aws') || topicLower.includes('azure') || topicLower.includes('server') || topicLower.includes('infrastructure')) {
+        return 'Cloud & Infrastructure';
+    }
+    if (topicLower.includes('security') || topicLower.includes('cyber') || topicLower.includes('privacy') || topicLower.includes('encryption')) {
+        return 'Cybersecurity';
+    }
+    if (topicLower.includes('web') || topicLower.includes('frontend') || topicLower.includes('backend') || topicLower.includes('api') || topicLower.includes('javascript') || topicLower.includes('react') || topicLower.includes('node')) {
+        return 'Web Development';
+    }
+
+    return 'Technology'; // Default category
+}
+
+function estimateReadTime(summary) {
+    const wordsPerMinute = 200; // Average reading speed
+    const wordCount = summary.split(' ').length;
+    const minutes = Math.ceil(wordCount / wordsPerMinute);
+    return Math.max(1, minutes); // Minimum 1 minute
+}
+
+function generateTrendUrl(topic) {
+    return `/trend/${topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 }
 
 // Run if called directly

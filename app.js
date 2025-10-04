@@ -93,17 +93,36 @@ async function fetchLatestTrends() {
 
 // Display trends in the UI
 async function displayTrends(trends) {
+    // Clear existing content
+    const trendsGrid = document.getElementById('trendsGrid');
+    const newsArticles = document.getElementById('newsArticles');
+
     trendsGrid.innerHTML = '';
+    newsArticles.innerHTML = '';
 
     if (trends.length === 0) {
-        trendsGrid.innerHTML = '<p style="text-align: center; color: white; grid-column: 1 / -1;">No trends found. Try fetching again!</p>';
+        trendsGrid.innerHTML = '<p style="text-align: center; color: #64748b; grid-column: 1 / -1; padding: 2rem;">No trends found. Try fetching again!</p>';
         return;
     }
 
-    trends.forEach(trend => {
-        const trendCard = createTrendCard(trend);
-        trendsGrid.appendChild(trendCard);
+    // Separate breaking news (high score) from regular trends
+    const breakingTrends = trends.filter(trend => trend.score >= 85);
+    const regularTrends = trends.filter(trend => trend.score < 85);
+
+    // Display breaking news in grid
+    breakingTrends.forEach(trend => {
+        const articleCard = createArticleCard(trend, true);
+        trendsGrid.appendChild(articleCard);
     });
+
+    // Display regular trends as articles
+    regularTrends.forEach(trend => {
+        const articleCard = createArticleCard(trend, false);
+        newsArticles.appendChild(articleCard);
+    });
+
+    // Update trending sidebar
+    updateTrendingSidebar(trends);
 }
 
 // Create a trend card element
@@ -323,9 +342,88 @@ async function generateDemoTrends() {
     ];
 }
 
+// Create article card for news layout
+function createArticleCard(trend, isBreaking = false) {
+    const card = document.createElement('article');
+    card.className = `article-card ${trend.isNew ? 'new' : ''}`;
+
+    const categoryEmoji = getCategoryEmoji(trend.category);
+    const timeAgo = getTimeAgo(trend.publishedAt);
+
+    card.innerHTML = `
+        <div class="article-image">
+            ${categoryEmoji}
+        </div>
+        <div class="article-content">
+            <div class="article-meta">
+                <span class="article-category">${trend.category}</span>
+                <span class="article-date">📅 ${timeAgo}</span>
+                <span class="article-read-time">⏱️ ${trend.readTime} min read</span>
+            </div>
+            <h2 class="article-title">${trend.topic}</h2>
+            <p class="article-excerpt">${trend.summary}</p>
+            <div class="article-footer">
+                <div class="article-sources">
+                    ${trend.sources.map(source => `<span class="source-tag">${source}</span>`).join('')}
+                </div>
+                <span class="article-score">Score: ${trend.score}</span>
+            </div>
+        </div>
+    `;
+
+    return card;
+}
+
+// Update trending sidebar
+function updateTrendingSidebar(trends) {
+    const trendingNow = document.getElementById('trendingNow');
+    if (!trendingNow) return;
+
+    // Sort by score and take top 5
+    const topTrends = trends
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5);
+
+    trendingNow.innerHTML = topTrends.map((trend, index) => `
+        <div class="trending-item">
+            <span class="trending-number">${index + 1}</span>
+            <span class="trending-text">${trend.topic}</span>
+        </div>
+    `).join('');
+}
+
+// Get emoji for category
+function getCategoryEmoji(category) {
+    const emojiMap = {
+        'AI & Machine Learning': '🤖',
+        'Web3 & Blockchain': '⛓️',
+        'Startups & Business': '🚀',
+        'Developer Tools': '💻',
+        'Web Development': '🌐',
+        'Mobile & Apps': '📱',
+        'Cloud & Infrastructure': '☁️',
+        'Cybersecurity': '🔒',
+        'Technology': '⚡'
+    };
+
+    return emojiMap[category] || '📊';
+}
+
+// Get time ago string
+function getTimeAgo(dateString) {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diff = Math.floor((now - date) / 1000);
+
+    if (diff < 60) return 'Just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+    return date.toLocaleDateString();
+}
+
 // Error handling for missing Firebase config
 window.addEventListener('error', function(event) {
     if (event.message.includes('firebase')) {
-        alert('Firebase configuration is missing. Please update the config in app.js');
+        console.log('Firebase not available - using GitHub deployment');
     }
 });

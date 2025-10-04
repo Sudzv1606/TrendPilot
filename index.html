@@ -3,56 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TrendPilot - Tech & Business Trends Radar</title>
+    <title>TrendPilot - AI-Powered Tech Trends & Analysis</title>
+    <meta name="description" content="Stay ahead with AI-powered analysis of emerging tech and business trends from Reddit, GitHub, and Hacker News.">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🚀 TrendPilot</h1>
-            <p>Your AI-powered radar for emerging tech and business trends</p>
-        </header>
-
-        <main>
-            <section class="controls">
-                <button id="fetchTrends" class="btn-primary">🔍 Fetch Latest Trends</button>
-                <div class="filters">
-                    <label for="sourceFilter">Filter by source:</label>
-                    <select id="sourceFilter">
-                        <option value="all">All Sources</option>
-                        <option value="reddit">Reddit</option>
-                        <option value="producthunt">Product Hunt</option>
-                        <option value="github">GitHub</option>
-                        <option value="hackernews">Hacker News</option>
-                    </select>
+    <div class="news-container">
+        <!-- Header -->
+        <header class="news-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <h1>🚀 TrendPilot</h1>
+                    <p class="tagline">AI-Powered Tech Trends & Analysis</p>
                 </div>
-            </section>
-
-            <section class="loading" id="loading" style="display: none;">
-                <div class="spinner"></div>
-                <p>Analyzing trends with AI...</p>
-            </section>
-
-            <section class="trends-container" id="trendsContainer">
-                <div class="trends-header">
-                    <h2>Top Trends</h2>
+                <div class="header-actions">
+                    <button id="fetchTrends" class="btn-primary">🔄 Refresh Trends</button>
                     <div class="last-updated" id="lastUpdated">Never updated</div>
                 </div>
+            </div>
+        </header>
 
-                <div class="trends-grid" id="trendsGrid">
-                    <!-- Trends will be populated here -->
+        <div class="news-layout">
+            <!-- Main Content -->
+            <main class="news-main">
+                <!-- Breaking News Section -->
+                <section class="breaking-news">
+                    <h2>🔥 Breaking Tech Trends</h2>
+                    <div class="trends-grid" id="trendsGrid">
+                        <!-- Breaking trends will be populated here -->
+                    </div>
+                </section>
+
+                <!-- Regular News Section -->
+                <section class="regular-news">
+                    <div class="section-header">
+                        <h2>📈 Trending Analysis</h2>
+                        <div class="view-options">
+                            <select id="categoryFilter">
+                                <option value="all">All Categories</option>
+                                <option value="AI & Machine Learning">AI & ML</option>
+                                <option value="Web3 & Blockchain">Web3</option>
+                                <option value="Startups & Business">Startups</option>
+                                <option value="Developer Tools">Dev Tools</option>
+                                <option value="Web Development">Web Dev</option>
+                                <option value="Mobile & Apps">Mobile</option>
+                                <option value="Cloud & Infrastructure">Cloud</option>
+                                <option value="Cybersecurity">Security</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="news-articles" id="newsArticles">
+                        <!-- Regular trends will be populated here -->
+                    </div>
+                </section>
+
+                <!-- Loading Indicator -->
+                <section class="loading" id="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>🔍 Analyzing latest trends with AI...</p>
+                </section>
+            </main>
+
+            <!-- Sidebar -->
+            <aside class="news-sidebar">
+                <!-- Trending Now -->
+                <section class="sidebar-widget">
+                    <h3>🔥 Trending Now</h3>
+                    <div id="trendingNow">
+                        <div class="trending-item">
+                            <span class="trending-number">1</span>
+                            <span class="trending-text">AI Agent Frameworks</span>
+                        </div>
+                        <div class="trending-item">
+                            <span class="trending-number">2</span>
+                            <span class="trending-text">Web3 Gaming</span>
+                        </div>
+                        <div class="trending-item">
+                            <span class="trending-number">3</span>
+                            <span class="trending-text">Decentralized Social</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Categories -->
+                <section class="sidebar-widget">
+                    <h3>📂 Categories</h3>
+                    <div class="categories-list">
+                        <span class="category-tag active">All</span>
+                        <span class="category-tag">AI & ML</span>
+                        <span class="category-tag">Web3</span>
+                        <span class="category-tag">Startups</span>
+                        <span class="category-tag">Dev Tools</span>
+                    </div>
+                </section>
+
+                <!-- Recent Updates -->
+                <section class="sidebar-widget">
+                    <h3>🕐 Recent Updates</h3>
+                    <div class="update-timeline">
+                        <div class="update-item">
+                            <span class="update-time">2 min ago</span>
+                            <span class="update-text">AI trends updated</span>
+                        </div>
+                        <div class="update-item">
+                            <span class="update-time">32 min ago</span>
+                            <span class="update-text">Web3 trends updated</span>
+                        </div>
+                        <div class="update-item">
+                            <span class="update-time">1 hour ago</span>
+                            <span class="update-text">Startup trends updated</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Newsletter Signup -->
+                <section class="sidebar-widget newsletter-widget">
+                    <h3>📧 Stay Updated</h3>
+                    <p>Get the latest tech trends delivered to your inbox.</p>
+                    <button class="btn-secondary">Subscribe</button>
+                </section>
+            </aside>
+        </div>
+
+        <!-- Footer -->
+        <footer class="news-footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>TrendPilot</h4>
+                    <p>AI-powered analysis of emerging tech trends</p>
                 </div>
-            </section>
-
-            <section class="visualization">
-                <h2>Trend Frequency Over Time</h2>
-                <canvas id="trendsChart" width="800" height="400"></canvas>
-            </section>
-        </main>
-
-        <footer>
-            <p>Built with GitHub Pages, OpenRouter AI, and ❤️ | <a href="https://github.com/Sudzv1606/TrendPilot" target="_blank">View on GitHub</a></p>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="#trends">Latest Trends</a>
+                    <a href="#categories">Categories</a>
+                    <a href="#about">About</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <a href="https://github.com/Sudzv1606/TrendPilot" target="_blank">GitHub</a>
+                    <a href="#twitter">Twitter</a>
+                    <a href="#linkedin">LinkedIn</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TrendPilot. Built with GitHub Pages, OpenRouter AI, and ❤️</p>
+            </div>
         </footer>
     </div>
 
