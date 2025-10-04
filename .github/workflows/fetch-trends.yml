@@ -24,7 +24,12 @@ jobs:
         run: npm ci
 
       - name: Fetch and analyze trends
-        run: node scripts/fetch-trends.js
+        run: |
+          echo "Checking environment variables..."
+          echo "OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}"
+          echo "REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}"
+          echo "Running trend fetch script..."
+          node scripts/fetch-trends.js
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
