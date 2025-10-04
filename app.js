@@ -1,0 +1,369 @@
+// Firebase configuration and initialization
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js';
+import { connectFirestoreEmulator } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+// Local Firebase Emulator Configuration
+const firebaseConfig = {
+    apiKey: "demo-key",
+    authDomain: "localhost",
+    projectId: "demo-trendpilot"
+};
+
+// Initialize Firebase with local emulators
+const app = initializeApp(firebaseConfig);
+
+// Connect to local emulators for testing
+const db = getFirestore(app);
+const functions = getFunctions(app);
+
+// Point to local emulators if running locally
+if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+    connectFirestoreEmulator(db, '127.0.0.1', 8080);
+    connectFunctionsEmulator(functions, '127.0.0.1', 5001);
+}
+
+// DOM elements
+const fetchButton = document.getElementById('fetchTrends');
+const loadingSection = document.getElementById('loading');
+const trendsContainer = document.getElementById('trendsContainer');
+const trendsGrid = document.getElementById('trendsGrid');
+const lastUpdated = document.getElementById('lastUpdated');
+const sourceFilter = document.getElementById('sourceFilter');
+const trendsChart = document.getElementById('trendsChart').getContext('2d');
+
+// Chart.js instance
+let chart;
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', function() {
+    loadStoredTrends();
+    setupEventListeners();
+});
+
+// Event listeners
+function setupEventListeners() {
+    fetchButton.addEventListener('click', fetchLatestTrends);
+    sourceFilter.addEventListener('change', filterTrends);
+}
+
+// Fetch latest trends from backend
+async function fetchLatestTrends() {
+    try {
+        // Disable button and show loading
+        fetchButton.disabled = true;
+        fetchButton.textContent = '🔄 Fetching...';
+        loadingSection.style.display = 'block';
+        trendsContainer.style.display = 'none';
+
+        // Initialize API client
+        const api = new TrendPilotAPI();
+
+        // Fetch trends using the API client
+        const result = await api.getTrends();
+
+        if (result && result.success) {
+            await displayTrends(result.trends);
+            await updateChart(result.trends);
+            updateLastUpdatedTime();
+
+            // Cache the results
+            try {
+                localStorage.setItem('trendpilot-trends', JSON.stringify({
+                    timestamp: new Date(),
+                    trends: result.trends,
+                    source: result.source || 'api'
+                }));
+            } catch (storageError) {
+                console.log('Local storage not available');
+            }
+
+        } else {
+            throw new Error('Invalid response from API');
+        }
+
+    } catch (error) {
+        console.error('Error fetching trends:', error);
+
+        // Try to load from cache
+        try {
+            const cached = localStorage.getItem('trendpilot-trends');
+            if (cached) {
+                const cachedData = JSON.parse(cached);
+                await displayTrends(cachedData.trends);
+                await updateChart(cachedData.trends);
+                updateLastUpdatedTime(new Date(cachedData.timestamp));
+                console.log('Loaded from cache');
+                return;
+            }
+        } catch (cacheError) {
+            console.log('No cached data available');
+        }
+
+        // Final fallback to demo data
+        const demoTrends = await generateDemoTrends();
+        await displayTrends(demoTrends);
+        await updateChart(demoTrends);
+        updateLastUpdatedTime();
+
+    } finally {
+        // Re-enable button and hide loading
+        fetchButton.disabled = false;
+        fetchButton.textContent = '🔍 Fetch Latest Trends';
+        loadingSection.style.display = 'none';
+        trendsContainer.style.display = 'block';
+    }
+}
+
+// Display trends in the UI
+async function displayTrends(trends) {
+    trendsGrid.innerHTML = '';
+
+    if (trends.length === 0) {
+        trendsGrid.innerHTML = '<p style="text-align: center; color: white; grid-column: 1 / -1;">No trends found. Try fetching again!</p>';
+        return;
+    }
+
+    trends.forEach(trend => {
+        const trendCard = createTrendCard(trend);
+        trendsGrid.appendChild(trendCard);
+    });
+}
+
+// Create a trend card element
+function createTrendCard(trend) {
+    const card = document.createElement('div');
+    card.className = 'trend-card';
+
+    const sources = trend.sources.map(source =>
+        `<span class="source-tag">${source}</span>`
+    ).join('');
+
+    const examples = trend.examples.map(example =>
+        `<li>${example}</li>`
+    ).join('');
+
+    card.innerHTML = `
+        <div class="trend-topic">${trend.topic}</div>
+        <div class="trend-score">Score: ${trend.score}</div>
+        <div class="trend-summary">${trend.summary}</div>
+        <div class="trend-sources">
+            ${sources}
+        </div>
+        <div class="trend-examples">
+            <h4>Examples:</h4>
+            <ul>${examples}</ul>
+        </div>
+    `;
+
+    return card;
+}
+
+// Update the trends chart
+async function updateChart(trends) {
+    const labels = trends.map(trend => trend.topic);
+    const scores = trends.map(trend => trend.score);
+
+    if (chart) {
+        chart.destroy();
+    }
+
+    chart = new Chart(trendsChart, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Trend Score',
+                data: scores,
+                backgroundColor: 'rgba(76, 175, 80, 0.6)',
+                borderColor: 'rgba(76, 175, 80, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        color: 'white'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: 'white',
+                        maxRotation: 45
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'white'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Load stored trends from Firestore
+async function loadStoredTrends() {
+    try {
+        // Check if Firestore is available
+        if (typeof db === 'undefined') {
+            console.log('Firestore not available, skipping stored trends load');
+            return;
+        }
+
+        const q = query(collection(db, 'trendSessions'), orderBy('timestamp', 'desc'), limit(1));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const latestSession = querySnapshot.docs[0].data();
+            await displayTrends(latestSession.trends);
+            await updateChart(latestSession.trends);
+            updateLastUpdatedTime(new Date(latestSession.timestamp.toDate()));
+        }
+    } catch (error) {
+        console.log('Firestore not available, using demo mode:', error.message);
+        // Firestore not available, this is expected in local testing
+        // The app will work with demo data instead
+    }
+}
+
+// Store trends in Firestore
+async function storeTrends(trends) {
+    try {
+        // Check if Firestore is available
+        if (typeof db === 'undefined') {
+            console.log('Firestore not available, skipping trend storage');
+            return;
+        }
+
+        await addDoc(collection(db, 'trendSessions'), {
+            timestamp: new Date(),
+            trends: trends
+        });
+    } catch (error) {
+        console.log('Firestore not available, skipping trend storage:', error.message);
+    }
+}
+
+// Filter trends by source
+function filterTrends() {
+    const selectedSource = sourceFilter.value;
+    const trendCards = document.querySelectorAll('.trend-card');
+
+    trendCards.forEach(card => {
+        const sourceTags = card.querySelectorAll('.source-tag');
+        let hasSelectedSource = false;
+
+        if (selectedSource === 'all') {
+            hasSelectedSource = true;
+        } else {
+            sourceTags.forEach(tag => {
+                if (tag.textContent.toLowerCase() === selectedSource.toLowerCase()) {
+                    hasSelectedSource = true;
+                }
+            });
+        }
+
+        card.style.display = hasSelectedSource ? 'block' : 'none';
+    });
+}
+
+// Update last updated time
+function updateLastUpdatedTime(date = new Date()) {
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+
+    let timeString;
+    if (diff < 60) {
+        timeString = 'Just now';
+    } else if (diff < 3600) {
+        timeString = `${Math.floor(diff / 60)} minutes ago`;
+    } else if (diff < 86400) {
+        timeString = `${Math.floor(diff / 3600)} hours ago`;
+    } else {
+        timeString = date.toLocaleDateString();
+    }
+
+    lastUpdated.textContent = `Last updated: ${timeString}`;
+}
+
+// Generate demo trends for local testing
+async function generateDemoTrends() {
+    return [
+        {
+            topic: "AI Agent Frameworks",
+            score: 92,
+            summary: "Open-source frameworks for building AI agents are gaining massive traction, with developers creating specialized tools for autonomous task completion.",
+            sources: ["GitHub", "Reddit"],
+            examples: [
+                "AutoGPT framework reaches 50k+ stars",
+                "LangChain agents for complex workflows",
+                "BabyAGI-inspired productivity tools"
+            ]
+        },
+        {
+            topic: "Web3 Gaming Infrastructure",
+            score: 87,
+            summary: "Blockchain gaming platforms are evolving with better developer tools, making it easier to create play-to-earn experiences.",
+            sources: ["Product Hunt", "Hacker News"],
+            examples: [
+                "Thirdweb gaming SDK launches",
+                "Immutable X for NFT games",
+                "Play-to-earn tokenomics platforms"
+            ]
+        },
+        {
+            topic: "Decentralized Social Media",
+            score: 78,
+            summary: "New social platforms built on blockchain technology are emerging, focusing on user ownership and censorship resistance.",
+            sources: ["Reddit", "GitHub"],
+            examples: [
+                "Lens Protocol social dApps",
+                "Farcaster decentralized Twitter",
+                "Mastodon federation growth"
+            ]
+        },
+        {
+            topic: "Climate Tech SaaS",
+            score: 85,
+            summary: "B2B software solutions for carbon tracking and sustainability management are becoming essential for enterprise compliance.",
+            sources: ["Product Hunt", "Hacker News"],
+            examples: [
+                "Carbon accounting platforms",
+                "Supply chain emission tracking",
+                "ESG reporting automation tools"
+            ]
+        },
+        {
+            topic: "No-Code AI Tools",
+            score: 73,
+            summary: "User-friendly platforms that let non-technical users build AI applications without coding knowledge.",
+            sources: ["Product Hunt", "Reddit"],
+            examples: [
+                "GPT-powered app builders",
+                "Visual AI workflow tools",
+                "No-code machine learning platforms"
+            ]
+        }
+    ];
+}
+
+// Error handling for missing Firebase config
+window.addEventListener('error', function(event) {
+    if (event.message.includes('firebase')) {
+        alert('Firebase configuration is missing. Please update the config in app.js');
+    }
+});

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrendPilot - Tech & Business Trends Radar</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 TrendPilot</h1>
+            <p>Your AI-powered radar for emerging tech and business trends</p>
+        </header>
+
+        <main>
+            <section class="controls">
+                <button id="fetchTrends" class="btn-primary">🔍 Fetch Latest Trends</button>
+                <div class="filters">
+                    <label for="sourceFilter">Filter by source:</label>
+                    <select id="sourceFilter">
+                        <option value="all">All Sources</option>
+                        <option value="reddit">Reddit</option>
+                        <option value="producthunt">Product Hunt</option>
+                        <option value="github">GitHub</option>
+                        <option value="hackernews">Hacker News</option>
+                    </select>
+                </div>
+            </section>
+
+            <section class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyzing trends with AI...</p>
+            </section>
+
+            <section class="trends-container" id="trendsContainer">
+                <div class="trends-header">
+                    <h2>Top Trends</h2>
+                    <div class="last-updated" id="lastUpdated">Never updated</div>
+                </div>
+
+                <div class="trends-grid" id="trendsGrid">
+                    <!-- Trends will be populated here -->
+                </div>
+            </section>
+
+            <section class="visualization">
+                <h2>Trend Frequency Over Time</h2>
+                <canvas id="trendsChart" width="800" height="400"></canvas>
+            </section>
+        </main>
+
+        <footer>
+            <p>Built with GitHub Pages, OpenRouter AI, and ❤️ | <a href="https://github.com/Sudzv1606/TrendPilot" target="_blank">View on GitHub</a></p>
+        </footer>
+    </div>
+
+    <!-- TrendPilot API and App -->
+    <script src="api.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>
