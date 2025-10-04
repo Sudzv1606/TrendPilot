@@ -36,6 +36,20 @@ jobs:
           REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
           REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
 
+      - name: Update latest trends file
+        run: |
+          echo "Updating latest trends file..."
+          # Copy the latest trends file to trends-latest.json
+          ls -la data/
+          if ls data/trends-*.json 1> /dev/null 2>&1; then
+            LATEST_FILE=$(ls -t data/trends-*.json | head -1)
+            echo "Latest file: $LATEST_FILE"
+            cp "$LATEST_FILE" data/trends-latest.json
+            echo "Updated trends-latest.json"
+          else
+            echo "No trends files found"
+          fi
+
       - name: Commit and push if changed
         run: |
           git config --local user.email "action@github.com"
