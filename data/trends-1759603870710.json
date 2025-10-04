@@ -1,0 +1,33 @@
+{
+  "success": true,
+  "trends": [
+    {
+      "topic": "Trending on GitHub",
+      "score": 100,
+      "summary": "Popular content from GitHub with 20 relevant items",
+      "sources": [
+        "GitHub"
+      ],
+      "examples": [
+        "DeepSeek-V3",
+        "system-prompts-and-models-of-ai-tools",
+        "markitdown"
+      ]
+    },
+    {
+      "topic": "Trending on Hacker News",
+      "score": 100,
+      "summary": "Popular content from Hacker News with 30 relevant items",
+      "sources": [
+        "Hacker News"
+      ],
+      "examples": [
+        "Fluid Glass",
+        "Offline card payments should be possible no later than 1 July 2026",
+        "Zig builds are getting faster"
+      ]
+    }
+  ],
+  "totalItems": 50,
+  "timestamp": "2025-10-04T18:51:10.710Z"
+}

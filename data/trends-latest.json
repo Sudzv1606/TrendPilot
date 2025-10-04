@@ -2,26 +2,62 @@
   "success": true,
   "trends": [
     {
-      "topic": "🚀 TrendPilot News Website Active",
-      "score": 100,
-      "summary": "Welcome to the new TrendPilot news website! Real-time AI-powered trend analysis with continuous updates every 30 minutes.",
-      "sources": ["System"],
+      "topic": "🔥 Real-Time Trend Analysis Active",
+      "score": 95,
+      "summary": "TrendPilot is now running with real-time AI-powered trend analysis! New trends are being fetched and analyzed every 30 minutes with intelligent categorization.",
+      "sources": ["GitHub", "Hacker News"],
       "examples": [
-        "30-minute update intervals",
-        "AI-powered trend analysis",
-        "Real-time data from multiple sources",
-        "Modern news website layout"
+        "GitHub repository analysis active",
+        "Hacker News story processing",
+        "AI-powered trend categorization",
+        "30-minute update intervals"
       ],
-      "timestamp": "2025-10-04T23:25:00.000Z",
+      "timestamp": "2025-10-04T18:51:10.710Z",
       "category": "Technology",
       "readTime": 2,
-      "url": "/trend/trendpilot-news-website-active",
+      "url": "/trend/real-time-trend-analysis-active",
       "isNew": true,
-      "publishedAt": "2025-10-04T23:25:00.000Z",
-      "lastUpdated": "2025-10-04T23:25:00.000Z"
+      "publishedAt": "2025-10-04T18:51:10.710Z",
+      "lastUpdated": "2025-10-04T18:51:10.710Z"
+    },
+    {
+      "topic": "Trending on GitHub",
+      "score": 90,
+      "summary": "Popular content from GitHub with 20 relevant items including AI models and developer tools.",
+      "sources": ["GitHub"],
+      "examples": [
+        "DeepSeek-V3",
+        "system-prompts-and-models-of-ai-tools",
+        "markitdown"
+      ],
+      "timestamp": "2025-10-04T18:51:10.710Z",
+      "category": "Developer Tools",
+      "readTime": 1,
+      "url": "/trend/trending-on-github",
+      "isNew": false,
+      "publishedAt": "2025-10-04T18:51:10.710Z",
+      "lastUpdated": "2025-10-04T18:51:10.710Z"
+    },
+    {
+      "topic": "Trending on Hacker News",
+      "score": 88,
+      "summary": "Popular content from Hacker News with 30 relevant items covering tech news and developer discussions.",
+      "sources": ["Hacker News"],
+      "examples": [
+        "Fluid Glass",
+        "Offline card payments should be possible no later than 1 July 2026",
+        "Zig builds are getting faster"
+      ],
+      "timestamp": "2025-10-04T18:51:10.710Z",
+      "category": "Technology",
+      "readTime": 1,
+      "url": "/trend/trending-on-hacker-news",
+      "isNew": false,
+      "publishedAt": "2025-10-04T18:51:10.710Z",
+      "lastUpdated": "2025-10-04T18:51:10.710Z"
     }
   ],
-  "totalItems": 1,
-  "timestamp": "2025-10-04T23:25:00.000Z",
-  "source": "system"
+  "totalItems": 50,
+  "timestamp": "2025-10-04T18:51:10.710Z",
+  "source": "api"
 }
