@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "trends": [
+    {
+      "topic": "⚠️ Setup Required",
+      "score": 100,
+      "summary": "GitHub Actions workflow needs to be triggered to fetch real trend data. Please run the 'Fetch Latest Trends' workflow manually.",
+      "sources": ["System"],
+      "examples": [
+        "Go to Actions tab in your repository",
+        "Click 'Fetch Latest Trends' workflow",
+        "Click 'Run workflow' button",
+        "Wait for completion and refresh"
+      ],
+      "timestamp": "2025-10-04T23:20:00.000Z"
+    }
+  ],
+  "totalItems": 1,
+  "timestamp": "2025-10-04T23:20:00.000Z",
+  "source": "setup"
+}
