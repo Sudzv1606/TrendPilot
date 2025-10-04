@@ -3,7 +3,7 @@ name: Fetch Latest Trends
 on:
   schedule:
     - cron: '0 */6 * * *'  # Every 6 hours
-  workflow_dispatch:
+  workflow_dispatch:  # Enables manual triggering
 
 jobs:
   fetch-trends:
