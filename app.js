@@ -1,28 +1,5 @@
-// Firebase configuration and initialization
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js';
-import { connectFirestoreEmulator } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-// Local Firebase Emulator Configuration
-const firebaseConfig = {
-    apiKey: "demo-key",
-    authDomain: "localhost",
-    projectId: "demo-trendpilot"
-};
-
-// Initialize Firebase with local emulators
-const app = initializeApp(firebaseConfig);
-
-// Connect to local emulators for testing
-const db = getFirestore(app);
-const functions = getFunctions(app);
-
-// Point to local emulators if running locally
-if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
-    connectFirestoreEmulator(db, '127.0.0.1', 8080);
-    connectFunctionsEmulator(functions, '127.0.0.1', 5001);
-}
+// Firebase configuration removed - using GitHub Pages deployment
+// All Firebase dependencies removed for GitHub-native deployment
 
 // DOM elements
 const fetchButton = document.getElementById('fetchTrends');
@@ -215,46 +192,33 @@ async function updateChart(trends) {
     });
 }
 
-// Load stored trends from Firestore
+// Load stored trends (now uses localStorage instead of Firestore)
 async function loadStoredTrends() {
     try {
-        // Check if Firestore is available
-        if (typeof db === 'undefined') {
-            console.log('Firestore not available, skipping stored trends load');
-            return;
-        }
-
-        const q = query(collection(db, 'trendSessions'), orderBy('timestamp', 'desc'), limit(1));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-            const latestSession = querySnapshot.docs[0].data();
-            await displayTrends(latestSession.trends);
-            await updateChart(latestSession.trends);
-            updateLastUpdatedTime(new Date(latestSession.timestamp.toDate()));
+        // Try to load from localStorage cache
+        const cached = localStorage.getItem('trendpilot-trends');
+        if (cached) {
+            const cachedData = JSON.parse(cached);
+            await displayTrends(cachedData.trends);
+            await updateChart(cachedData.trends);
+            updateLastUpdatedTime(new Date(cachedData.timestamp));
+            console.log('Loaded cached trends from localStorage');
         }
     } catch (error) {
-        console.log('Firestore not available, using demo mode:', error.message);
-        // Firestore not available, this is expected in local testing
-        // The app will work with demo data instead
+        console.log('No cached data available, using demo data');
     }
 }
 
-// Store trends in Firestore
+// Store trends (now uses localStorage instead of Firestore)
 async function storeTrends(trends) {
     try {
-        // Check if Firestore is available
-        if (typeof db === 'undefined') {
-            console.log('Firestore not available, skipping trend storage');
-            return;
-        }
-
-        await addDoc(collection(db, 'trendSessions'), {
+        localStorage.setItem('trendpilot-trends', JSON.stringify({
             timestamp: new Date(),
             trends: trends
-        });
+        }));
+        console.log('Trends cached in localStorage');
     } catch (error) {
-        console.log('Firestore not available, skipping trend storage:', error.message);
+        console.log('Could not cache trends in localStorage:', error.message);
     }
 }
 
