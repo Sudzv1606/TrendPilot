@@ -60,14 +60,8 @@ class TrendPilotAPI {
         } catch (error) {
             console.error('All API sources failed:', error);
 
-            // Return demo data as final fallback
-            return {
-                success: true,
-                trends: this.getDemoTrends(),
-                totalItems: 5,
-                timestamp: new Date().toISOString(),
-                source: 'demo'
-            };
+            // Don't return demo data - force error to show something is wrong
+            throw new Error('Unable to fetch real trend data. Please check GitHub Actions workflow.');
         }
     }
 

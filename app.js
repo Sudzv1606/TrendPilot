@@ -78,11 +78,9 @@ async function fetchLatestTrends() {
             console.log('No cached data available');
         }
 
-        // Final fallback to demo data
-        const demoTrends = await generateDemoTrends();
-        await displayTrends(demoTrends);
-        await updateChart(demoTrends);
-        updateLastUpdatedTime();
+        // No demo data fallback - force real data fetching
+        alert('Unable to fetch real trend data. Please ensure GitHub Actions workflow is running properly.');
+        console.error('Failed to fetch real data and no demo fallback available');
 
     } finally {
         // Re-enable button and hide loading
